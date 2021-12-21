@@ -1,6 +1,5 @@
+TAPGui = {scriptName = "TapGUI:SetName('name')", rainbow = false, expanded = false, expanding = nil, expandedRendered = false, sliderFocused = false, sliderFocusedOn = nil, windows = {}}
 
-TAPGui = {scriptName = "TapGUI:SetName('name')", rainbow = false, expanded = false, expanding = nil, expandedRendered = false}
-TAPGui.windows = {};
 
 function TAPGui:SetName(name) 
 	TAPGui.scriptName = name;
@@ -9,7 +8,7 @@ function TAPGui:NameRainbow(bool)
 	TAPGui.rainbow = bool;
 end
 function TAPGui:NewWindow(name)
-	local new = {name = name, toggles = {}, buttons = {}};
+	local new = {name = name, toggles = {}, buttons = {}, sliders = {}};
 	function new:addToggle(toggleName, func)
 		local d = {name = toggleName, callback = func, toggled = false}
 		function d:Toggle()
@@ -18,12 +17,20 @@ function TAPGui:NewWindow(name)
 		end
 		table.insert(new.toggles, d)
 	end
-	function new:addButton(toggleName, func)
-		local d = {name = toggleName, callback = func}
+	function new:addButton(buttonName, func)
+		local d = {name = buttonName, callback = func}
 		function d:Execute()
 			func()
 		end
 		table.insert(new.buttons, d)
+	end
+	function new:addSlider(SliderName,defaultInteger,minimumInteger,maximalInteger,func)
+		local d = {name = SliderName, callback = func, number = defaultInteger, min = minimumInteger, max = maximalInteger}
+		function d:Update(number)
+			d.number = number
+			func(number)
+		end
+		table.insert(new.sliders, d)
 	end
 	return new
 end
@@ -76,13 +83,13 @@ function render(TAPGui)
 		TextButton.Text = v.name
 		TextButton.MouseButton1Up:Connect(function()
 			
-			if TAPGui.expanded then
+			if TAPGui.expanded and not TAPGui.sliderFocused then
 				if TAPGui.expanding == v.name then
 					TAPGui.expanded = false
 					TAPGui.expanding = nil
 					TextButton.BackgroundTransparency = 0.800
 				end
-			elseif not TAPGui.expanded and #v.toggles > 0 then
+			elseif not TAPGui.expanded and #v.toggles > 0 or #v.buttons > 0 or #v.sliders > 0 then
 				TAPGui.expanded = true
 				TAPGui.expanding = v.name
 				TextButton.BackgroundTransparency = 0.500
@@ -103,7 +110,7 @@ function render(TAPGui)
 	
 	coroutine.wrap(function()
 		while wait() do
-			if TAPGui.expanded and TAPGui.expanding ~= nil and not TAPGui.expandedRendered then
+			if TAPGui.expanded and TAPGui.expanding ~= nil and not TAPGui.expandedRendered and not TAPGui.sliderFocused then
 				
 				wait()
 				local e = nil;
@@ -167,6 +174,57 @@ function render(TAPGui)
 						end)
 						TextButton.BackgroundTransparency = 0.800
 						TextButton.Name = 'expanded'
+						next = next + (0.5 * i)
+					end
+					for i, v in ipairs(e.sliders) do 
+						local TextButton = Instance.new("TextButton")
+						TextButton.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild('susamogus'):WaitForChild("handler")
+						TextButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+						TextButton.BackgroundTransparency = 0.800
+						TextButton.Position = UDim2.new(3.3, 0, next + (0.5 * i), 0)
+						TextButton.Size = UDim2.new(0, 148, 0, 50)
+						TextButton.Font = Enum.Font.SourceSans
+						TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+						TextButton.TextScaled = true
+						TextButton.TextSize = 14.000
+						TextButton.TextWrapped = true
+						local numberonstring = v.name .. ":" .. tostring(v.number)
+						TextButton.Text = numberonstring
+						TextButton.MouseButton1Up:Connect(function()
+							TAPGui.sliderFocused = not TAPGui.sliderFocused;
+							if TAPGui.sliderFocused then
+								TextButton.BackgroundTransparency = 0.400
+								
+							else
+								TextButton.BackgroundTransparency = 1
+							end
+							
+						end)
+						local up = Enum.KeyCode.Up
+						local down = Enum.KeyCode.Down
+						
+						TextButton.Name = 'expanded'
+						
+						game:GetService("UserInputService").InputBegan:Connect(function()
+							if not TAPGui.sliderFocused then
+								return
+							end
+							
+							if game:GetService("UserInputService"):IsKeyDown(up) and (v.number + 1) <= v.max then
+								TextButton.Text = v.name .. ":" .. tostring(v.number)
+								
+								
+								v:Update(v.number + 1)
+							end
+							if game:GetService("UserInputService"):IsKeyDown(down) and (v.number - 1) >= v.min  then
+								TextButton.Text = v.name .. ":" .. tostring(v.number)
+								
+								
+								v:Update(v.number - 1)
+							end
+						end)
+
+						
 					end
 				end
 				
@@ -180,6 +238,7 @@ function render(TAPGui)
 						end
 					end
 					TAPGui.expandedRendered = false;
+					TAPGui.sliderFocused = false
 				end
 			end
 			wait()
