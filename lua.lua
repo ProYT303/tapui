@@ -213,7 +213,9 @@ function render(TAPGui)
 							if not TAPGui.sliderFocused then
 								return
 							end
-							
+							if TAPGui.sliderFocusedOn ~= v.name then
+								return			
+							end
 							if game:GetService("UserInputService"):IsKeyDown(up) and (v.number + 1) <= v.max then
 								TextButton.Text = v.name .. ":" .. tostring(v.number)
 								
