@@ -191,13 +191,14 @@ function render(TAPGui)
 						local numberonstring = v.name .. ":" .. tostring(v.number)
 						TextButton.Text = numberonstring
 						TextButton.MouseButton1Up:Connect(function()
-							TAPGui.sliderFocused = not TAPGui.sliderFocused;
-							TAPGui.sliderFocusedOn = v.name;
+							if not TAPGui.sliderFocused then
+								TAPGui.sliderFocused = not TAPGui.sliderFocused;
+								TAPGui.sliderFocusedOn = v.name;			
+							end
 							if TAPGui.sliderFocused and TAPGui.sliderFocusedOn == v.name then
 								TextButton.BackgroundTransparency = 0.400
-								
 							else
-								TextButton.BackgroundTransparency = 1
+								TextButton.BackgroundTransparency = 0.800
 							end
 							
 						end)
