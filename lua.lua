@@ -196,10 +196,10 @@ function render(TAPGui)
 								TAPGui.sliderFocusedOn = v.name;			
 							end
 							if TAPGui.sliderFocused and TAPGui.sliderFocusedOn == v.name then
-								TextButton.BackgroundTransparency = 0.400
-							else
 								TAPGui.sliderFocused = false
 								TAPGui.sliderFocusedOn = v.name;
+								TextButton.BackgroundTransparency = 0.400
+							elseif TAPGui.sliderFocusedOn == v.name and TAPGui.sliderFocused then
 								TextButton.BackgroundTransparency = 0.800
 							end
 							
