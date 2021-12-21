@@ -193,14 +193,13 @@ function render(TAPGui)
 						TextButton.MouseButton1Up:Connect(function()
 							if not TAPGui.sliderFocused then
 								TAPGui.sliderFocused = true;
-								TAPGui.sliderFocusedOn = v.name;			
+								TAPGui.sliderFocusedOn = v.name;	
+								TextButton.BackgroundTransparency = 0.400
 							end
 							if TAPGui.sliderFocused and TAPGui.sliderFocusedOn == v.name then
 								TAPGui.sliderFocused = false
 								TAPGui.sliderFocusedOn = nil;
 								TextButton.BackgroundTransparency = 0.800
-							elseif TAPGui.sliderFocusedOn == v.name and TAPGui.sliderFocused then
-								TextButton.BackgroundTransparency = 0.400
 							end
 							
 						end)
